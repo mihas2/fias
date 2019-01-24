@@ -1,0 +1,12 @@
+{
+	"name": "mirmagnitov/fias",
+    "config": {
+        "vendor-dir": "./vendor/"
+    },
+    "minimum-stability" : "dev",
+	"autoload": {
+		"psr-4": {
+			"Fias\\": "classes/"
+		}
+	}
+}

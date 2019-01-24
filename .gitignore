@@ -1,0 +1,11 @@
+/.idea/
+/.git/
+/dbf/
+composer.phar
+auth.json
+
+*.gz
+*.tgz
+*.tar.gz
+*.log
+*.sql
