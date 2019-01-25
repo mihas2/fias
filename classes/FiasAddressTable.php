@@ -3,7 +3,7 @@
 namespace Fias;
 
 
-class FiasAddressTable implements TableInfo
+class FiasAddressTable implements TableInfoInterface
 {
     /**
      * @return string

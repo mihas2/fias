@@ -33,7 +33,7 @@ function formatSizeUnits($bytes)
  * @param string $tableClass
  */
 function doConvert($files, $dir ,$tableClass) {
-    /** @var  $tableClass \Fias\TableInfo */
+    /** @var  $tableClass \Fias\TableInfoInterface */
 
     static $totalInserted = 0;
     static $totalRecords = 0;

@@ -42,8 +42,8 @@ class Dbf2Sql extends DbfReader
         if (!file_exists($filename)) {
             throw new \Exception("File '{$filename}' not exist");
         }
-        /** @var $tableInfo TableInfo */
-        if (!is_subclass_of($tableInfo, 'Fias\TableInfo')) {
+        /** @var $tableInfo TableInfoInterface */
+        if (!is_subclass_of($tableInfo, 'Fias\TableInfoInterface')) {
             throw new \Exception('tableInfo must be implements interface Fias\TableInfo');
         }
 

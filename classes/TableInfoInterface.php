@@ -3,7 +3,7 @@
 namespace Fias;
 
 
-interface TableInfo
+interface TableInfoInterface
 {
     /**
      * @return string

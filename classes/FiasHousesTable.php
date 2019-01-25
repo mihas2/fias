@@ -3,7 +3,7 @@
 namespace Fias;
 
 
-class FiasHousesTable implements TableInfo
+class FiasHousesTable implements TableInfoInterface
 {
     /**
      * @return string
