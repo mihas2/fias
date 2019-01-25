@@ -146,7 +146,7 @@ class Dbf2Sql extends DbfReader
     }
 
     /**
-     * @return \Bitrix\Main\DB\Connection
+     * @return mixed
      */
     private static function getDb()
     {
