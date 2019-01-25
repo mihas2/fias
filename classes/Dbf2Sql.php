@@ -2,8 +2,6 @@
 
 namespace Fias;
 
-use Bitrix\Main\Application;
-
 class Dbf2Sql extends DbfReader
 {
     /** @var array */
@@ -169,20 +167,6 @@ class Dbf2Sql extends DbfReader
         return $this->fieldCount;
     }
 
-    /**
-     *
-     */
-    public function createTable()
-    {
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTableExist()
-    {
-        return false;
-    }
 
     public function createIdentTable()
     {

@@ -1,6 +1,7 @@
 /.idea/
 /.git/
-/dbf/
+/dbf/*.dbf
+/dbf/*.DBF
 composer.phar
 auth.json
 
@@ -9,3 +10,9 @@ auth.json
 *.tar.gz
 *.log
 *.sql
+
+*.GZ
+*.TGZ
+*.TAR.GZ
+*.LOG
+*.SQL
