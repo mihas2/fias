@@ -22,7 +22,16 @@ interface TableInfoInterface
 
     /**
      * @param array $row - исходные данные записи ввиде массива, где ключ имя поля
+     *
      * @return bool
      */
     static public function isActual($row);
+
+    /**
+     * @param array $record
+     *
+     * @return array
+     */
+    static public function recordProcessing($record);
+
 }
