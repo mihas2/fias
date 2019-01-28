@@ -96,6 +96,13 @@ class Fias2Sql extends DbfReader
                     continue; // удаляем и пропускаем поля которые нам не нужны
                 }
                 switch ($this->fields[$field]['TYPE']) {
+                    case 'TEXT':
+                    case 'VARCHAR':
+                        $row[$field] = "'"
+                            .iconv("IBM866", "UTF-8", $val)
+                            . "'";
+                        break;
+
                     case 'DATE':
                         if (trim($val)) {
                             try {
@@ -119,9 +126,7 @@ class Fias2Sql extends DbfReader
                         break;
 
                     default:
-                        $row[$field] = "'"
-                            . iconv("IBM866", "UTF-8", $val)
-                            . "'";
+                        $row[$field] = "'{$val}'";
                 }
             }
             $sql = sprintf(
