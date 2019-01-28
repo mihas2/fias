@@ -3,7 +3,7 @@
 namespace Fias;
 
 
-class FiasAddressTable implements TableInfo
+class FiasAddressTable implements TableInfoInterface
 {
     /**
      * @return string
@@ -37,15 +37,15 @@ class FiasAddressTable implements TableInfo
                 )
                 collate=utf8_unicode_ci;
                 ",
-                "    
+            "    
                 create index fias_addr__index_next
                     on {$tableName} (nextid);
                 ",
-                "
+            "
                 create index fias_addr__index_parent
                     on {$tableName} (parentguid);
                 ",
-                "
+            "
                 create index fias_addr__index_prev
                     on {$tableName} (previd);
             "
@@ -76,4 +76,15 @@ class FiasAddressTable implements TableInfo
     {
         return (bool)trim($row['ACTSTATUS']);
     }
+
+    /**
+     * @param array $record
+     *
+     * @return array
+     */
+    static public function recordProcessing($record)
+    {
+        return $record;
+    }
+
 }

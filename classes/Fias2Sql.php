@@ -2,7 +2,7 @@
 
 namespace Fias;
 
-class Dbf2Sql extends DbfReader
+class Fias2Sql extends DbfReader
 {
     /** @var array */
     const TYPE = [
@@ -33,8 +33,10 @@ class Dbf2Sql extends DbfReader
 
     /**
      * Dbf2Sql constructor.
+     *
      * @param string $filename
      * @param string $tableInfo
+     *
      * @throws \Exception
      */
     public function __construct($filename, $tableInfo)
@@ -42,8 +44,8 @@ class Dbf2Sql extends DbfReader
         if (!file_exists($filename)) {
             throw new \Exception("File '{$filename}' not exist");
         }
-        /** @var $tableInfo TableInfo */
-        if (!is_subclass_of($tableInfo, 'Fias\TableInfo')) {
+        /** @var $tableInfo TableInfoInterface */
+        if (!is_subclass_of($tableInfo, 'Fias\TableInfoInterface')) {
             throw new \Exception('tableInfo must be implements interface Fias\TableInfo');
         }
 
@@ -85,19 +87,15 @@ class Dbf2Sql extends DbfReader
                 continue;
             }
 
-            foreach ($row as $field => $val) {
-                if (count($tableInfo::getTableFields()) > 0 && !in_array(strtolower($field), $tableInfo::getTableFields())) {
+            foreach ($tableInfo::recordProcessing($row) as $field => $val) {
+                if (count($tableInfo::getTableFields()) > 0
+                    && !in_array(
+                        strtolower($field), $tableInfo::getTableFields())
+                ) {
                     unset($row[$field]);
                     continue; // удаляем и пропускаем поля которые нам не нужны
                 }
                 switch ($this->fields[$field]['TYPE']) {
-                    case 'TEXT':
-                    case 'VARCHAR':
-                        $row[$field] = "'"
-                                       .iconv("IBM866", "UTF-8", $val)
-                                       . "'";
-                        break;
-
                     case 'DATE':
                         if (trim($val)) {
                             try {
@@ -119,15 +117,22 @@ class Dbf2Sql extends DbfReader
                     case 'FLOAT':
                         $row[$field] = (float)$val;
                         break;
+
+                    default:
+                        $row[$field] = "'"
+                            . iconv("IBM866", "UTF-8", $val)
+                            . "'";
                 }
             }
             $sql = sprintf(
                 "insert into %s (%s) values (%s) on duplicate key update %s;\n",
                 $this->tableName,
                 implode(", ", array_keys($row)), implode(", ", $row),
-                implode(", ", array_map(function ($val, $key) {
-                    return sprintf("%s = %s", $key, $val);
-                }, $row, array_keys($row)))
+                implode(
+                    ", ", array_map(
+                    function ($val, $key) {
+                        return sprintf("%s = %s", $key, $val);
+                    }, $row, array_keys($row)))
             );
 
             fwrite($fileHandle, $sql);
@@ -174,7 +179,7 @@ class Dbf2Sql extends DbfReader
             $t = ($field['TYPE'] === 'VARCHAR') ? "(" . $field['SIZE'] . ")" : '';
 
             $ta[] = " " . strtolower($field['NAME']) . " "
-                    . $field['TYPE'] . $t;
+                . $field['TYPE'] . $t;
         }
 
         $sql = sprintf(
