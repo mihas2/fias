@@ -10,9 +10,11 @@ auth.json
 *.tar.gz
 *.log
 *.sql
+*.sq3
 
 *.GZ
 *.TGZ
 *.TAR.GZ
 *.LOG
 *.SQL
+*.SQ3

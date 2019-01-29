@@ -27,7 +27,7 @@ class Fias2Sql extends DbfReader
     private $fields = [];
 
     /**
-     * @var mixed
+     * @var \PDO
      */
     private $db;
 
@@ -78,8 +78,7 @@ class Fias2Sql extends DbfReader
 
         $inserted = 0;
 
-        $fileHandle = fopen($this->tableName . ".sql", "a");
-
+        $this->db->beginTransaction();
         for ($i = 0; $i < $this->getRecordCount(); $i++) {
             $row = $this->fetch($i, false);
 
@@ -98,9 +97,7 @@ class Fias2Sql extends DbfReader
                 switch ($this->fields[$field]['TYPE']) {
                     case 'TEXT':
                     case 'VARCHAR':
-                        $row[$field] = "'"
-                            .iconv("IBM866", "UTF-8", $val)
-                            . "'";
+                        $row[$field] = $this->db->quote(iconv("IBM866", "UTF-8", $val));
                         break;
 
                     case 'DATE':
@@ -126,26 +123,27 @@ class Fias2Sql extends DbfReader
                         break;
 
                     default:
-                        $row[$field] = "'{$val}'";
+                        $row[$field] = $this->db->quote($val);
                 }
             }
             $sql = sprintf(
-                "insert into %s (%s) values (%s) on duplicate key update %s;\n",
+                "replace into %s (%s) values (%s);\n",
                 $this->tableName,
-                implode(", ", array_keys($row)), implode(", ", $row),
-                implode(
-                    ", ", array_map(
-                    function ($val, $key) {
-                        return sprintf("%s = %s", $key, $val);
-                    }, $row, array_keys($row)))
+                implode(", ", array_keys($row)),
+                implode(", ", $row)
             );
 
-            fwrite($fileHandle, $sql);
+            try {
+                $this->db->exec($sql);
+            } catch (\Exception $e) {
+                $this->db->rollBack();
+                throw $e;
+            }
 
             $inserted++;
         }
 
-        fclose($fileHandle);
+        $this->db->commit();
 
         return [
             "inserted" => $inserted,
@@ -154,11 +152,21 @@ class Fias2Sql extends DbfReader
     }
 
     /**
-     * @return mixed
+     * @return \PDO
      */
     private static function getDb()
     {
-        return null;
+
+        $pdo = new \PDO(
+            'sqlite:fias.sq3',
+            null,
+            null,
+            [\PDO::ATTR_PERSISTENT => true]
+        );
+
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        return $pdo;
     }
 
     /**
@@ -178,6 +186,22 @@ class Fias2Sql extends DbfReader
     }
 
 
+    public function dropTable()
+    {
+        $this->db->exec("drop table if exists " . $this->tableName);
+    }
+
+    /**
+     *
+     */
+    public function createTable()
+    {
+        foreach ($this->tableInfo::getCreateTableSql() as $sql) {
+            $this->db->exec($sql);
+        }
+    }
+
+
     public function createIdentTable()
     {
         foreach ($this->fields as $field) {
@@ -188,12 +212,12 @@ class Fias2Sql extends DbfReader
         }
 
         $sql = sprintf(
-            "create table if not exists %s (%s) engine=InnoDB collate=utf8_unicode_ci",
+            "create table if not exists %s (%s) collate=utf8",
             $this->tableName,
             implode(", ", $ta)
         );
 
-        $this->db->queryExecute($sql);
+        $this->db->exec($sql);
     }
 
     /**

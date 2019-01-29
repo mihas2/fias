@@ -21,6 +21,7 @@ class FiasAddressTable implements TableInfoInterface
         $tableName = static::getTableName();
 
         return [
+            "PRAGMA encoding = \"UTF-8\";",
             "
                 create table if not exists {$tableName}
                 (
@@ -34,21 +35,12 @@ class FiasAddressTable implements TableInfoInterface
                     shortname varchar(10) null,
                     constraint fias_addr_pk_id
                         unique (aoguid)
-                )
-                collate=utf8_unicode_ci;
-                ",
-            "    
-                create index fias_addr__index_next
-                    on {$tableName} (nextid);
+                );
                 ",
             "
                 create index fias_addr__index_parent
                     on {$tableName} (parentguid);
                 ",
-            "
-                create index fias_addr__index_prev
-                    on {$tableName} (previd);
-            "
         ];
     }
 
