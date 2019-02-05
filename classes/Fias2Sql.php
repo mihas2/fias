@@ -79,6 +79,14 @@ class Fias2Sql extends DbfReader
         $inserted = 0;
 
         $this->db->beginTransaction();
+
+        $sqliteExec = $this->db->prepare(sprintf(
+                               "replace into %s (%s) values (%s);\n",
+                               $this->tableName,
+                               implode(", ", $tableInfo::getTableFields()),
+                               implode(", ", array_fill(0, count($tableInfo::getTableFields()), '?'))
+                           ));
+
         for ($i = 0; $i < $this->getRecordCount(); $i++) {
             $row = $this->fetch($i, false);
 
@@ -97,15 +105,15 @@ class Fias2Sql extends DbfReader
                 switch ($this->fields[$field]['TYPE']) {
                     case 'TEXT':
                     case 'VARCHAR':
-                        $row[$field] = $this->db->quote(iconv("IBM866", "UTF-8", $val));
+                        $row[$field] = iconv("IBM866", "UTF-8", $val);
                         break;
 
                     case 'DATE':
                         if (trim($val)) {
                             try {
-                                $row[$field] = "'" . (new \DateTime(trim($val)))->format("Y-m-d H:i:s") . "'";
+                                $row[$field] = (new \DateTime(trim($val)))->format("Y-m-d H:i:s");
                             } catch (\Exception $e) {
-                                $row[$field] = "''";
+                                $row[$field] = "";
                             }
                         }
                         break;
@@ -126,15 +134,9 @@ class Fias2Sql extends DbfReader
                         $row[$field] = $this->db->quote($val);
                 }
             }
-            $sql = sprintf(
-                "replace into %s (%s) values (%s);\n",
-                $this->tableName,
-                implode(", ", array_keys($row)),
-                implode(", ", $row)
-            );
 
             try {
-                $this->db->exec($sql);
+                $sqliteExec->execute(array_values($row));
             } catch (\Exception $e) {
                 $this->db->rollBack();
                 throw $e;
