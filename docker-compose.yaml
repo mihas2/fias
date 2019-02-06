@@ -21,8 +21,7 @@ services:
         volumes:
             - mysql:/usr/local/mysql/data
             - ./docker/etc/mysql/conf/my.cnf:/etc/mysql/my.cnf
-            - ./docker/etc/mysql/conf/mysqld.cnf:/etc/mysql/percona-server.conf.d/mysqld.cnf
-            - ./docker/etc/mysql/conf/mysqld.cnf:/etc/mysql/conf.d/mysqld.cnf
+            - ./docker/etc/mysql/conf/mysqld.cnf:/etc/mysql/my.conf.d/mysqld.cnf
             - ./docker/mysql/install.sql:/docker-entrypoint-initdb.d/install.sql:ro
             - ./docker/log/mysql:/var/log/mysql
         environment:
