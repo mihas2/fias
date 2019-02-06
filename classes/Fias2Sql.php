@@ -26,6 +26,9 @@ class Fias2Sql extends DbfReader
     /** @var array */
     private $fields = [];
 
+    /** @var string */
+    private $fileName;
+
     /**
      * @var \PDO
      */
@@ -53,6 +56,8 @@ class Fias2Sql extends DbfReader
         $this->tableName = $tableInfo::getTableName();
         $this->db = static::getDb();
 
+        $this->fileName = $this->tableName . ".sql";
+
         parent::__construct($filename);
 
         $this->fieldCount = count($this->getInfos());
@@ -78,14 +83,15 @@ class Fias2Sql extends DbfReader
 
         $inserted = 0;
 
-        $this->db->beginTransaction();
 
-        $sqliteExec = $this->db->prepare(sprintf(
-                               "replace into %s (%s) values (%s);\n",
-                               $this->tableName,
-                               implode(", ", $tableInfo::getTableFields()),
-                               implode(", ", array_fill(0, count($tableInfo::getTableFields()), '?'))
-                           ));
+        $file = fopen($this->fileName, "a");
+
+
+        $sqlInsert = sprintf(
+            "insert into %s (%s) values (%%s);\n",
+            $this->tableName,
+            implode(", ", $tableInfo::getTableFields())
+        );
 
         for ($i = 0; $i < $this->getRecordCount(); $i++) {
             $row = $this->fetch($i, false);
@@ -105,15 +111,15 @@ class Fias2Sql extends DbfReader
                 switch ($this->fields[$field]['TYPE']) {
                     case 'TEXT':
                     case 'VARCHAR':
-                        $row[$field] = iconv("IBM866", "UTF-8", $val);
+                        $row[$field] = $this->db->quote(iconv("IBM866", "UTF-8", $val));
                         break;
 
                     case 'DATE':
                         if (trim($val)) {
                             try {
-                                $row[$field] = (new \DateTime(trim($val)))->format("Y-m-d H:i:s");
+                                $row[$field] = $this->db->quote((new \DateTime(trim($val)))->format("Y-m-d H:i:s"));
                             } catch (\Exception $e) {
-                                $row[$field] = "";
+                                $row[$field] = "''";
                             }
                         }
                         break;
@@ -135,17 +141,14 @@ class Fias2Sql extends DbfReader
                 }
             }
 
-            try {
-                $sqliteExec->execute(array_values($row));
-            } catch (\Exception $e) {
-                $this->db->rollBack();
-                throw $e;
-            }
+            $sql = sprintf($sqlInsert, implode(", ", $row));
+
+            fwrite($file, $sql . "\n");
 
             $inserted++;
         }
 
-        $this->db->commit();
+        fclose($file);
 
         return [
             "inserted" => $inserted,
@@ -158,12 +161,10 @@ class Fias2Sql extends DbfReader
      */
     private static function getDb()
     {
-
         $pdo = new \PDO(
-            'sqlite:fias.sq3',
-            null,
-            null,
-            [\PDO::ATTR_PERSISTENT => true]
+            "mysql:host=" . getenv('DB_HOST') . ";dbname=" . getenv('DB_NAME') . ";charset=" . getenv('DB_CHARSET'),
+            getenv('DB_USER'),
+            getenv('DB_PASSWORD')
         );
 
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -190,7 +191,9 @@ class Fias2Sql extends DbfReader
 
     public function dropTable()
     {
-        $this->db->exec("drop table if exists " . $this->tableName);
+        $file = fopen($this->fileName, "w");
+        fwrite($file, "drop table if exists " . $this->tableName."\n");
+        fclose($file);
     }
 
     /**
@@ -198,9 +201,11 @@ class Fias2Sql extends DbfReader
      */
     public function createTable()
     {
+        $file = fopen($this->fileName, "a");
         foreach ($this->tableInfo::getCreateTableSql() as $sql) {
-            $this->db->exec($sql);
+            fwrite($file, $sql."\n");
         }
+        fclose($file);
     }
 
 

@@ -4,6 +4,7 @@
 /dbf/*.DBF
 composer.phar
 auth.json
+.env
 
 *.gz
 *.tgz

@@ -40,9 +40,8 @@ class FiasHousesTable implements TableInfoInterface
         $tableName = static::getTableName();
 
         return [
-            "PRAGMA encoding = \"UTF-8\";",
             "
-                create table if not exists {$tableName}
+                create table if not exists $tableName
                 (
                     aoguid varchar(36) null,
                     buildnum varchar(10) null,
@@ -59,11 +58,12 @@ class FiasHousesTable implements TableInfoInterface
                     strname varchar(80) null,
                     constraint fias_houses_pk_2
                         unique (houseid)
-                );
+                )
+                collate=utf8_unicode_ci;
             ",
             "
                 create index fias_houses_aoguid_index
-                    on {$tableName} (aoguid);
+                    on $tableName (aoguid);
             "
         ];
     }
