@@ -192,7 +192,7 @@ class Fias2Sql extends DbfReader
     public function dropTable()
     {
         $file = fopen($this->fileName, "w");
-        fwrite($file, "drop table if exists " . $this->tableName."\n");
+        fwrite($file, "drop table if exists " . $this->tableName.";\n");
         fclose($file);
     }
 
