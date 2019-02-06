@@ -27,7 +27,7 @@ class Fias2Sql extends DbfReader
     private $fields = [];
 
     /**
-     * @var mixed
+     * @var \PDO
      */
     private $db;
 
@@ -78,7 +78,14 @@ class Fias2Sql extends DbfReader
 
         $inserted = 0;
 
-        $fileHandle = fopen($this->tableName . ".sql", "a");
+        $this->db->beginTransaction();
+
+        $sqliteExec = $this->db->prepare(sprintf(
+                               "replace into %s (%s) values (%s);\n",
+                               $this->tableName,
+                               implode(", ", $tableInfo::getTableFields()),
+                               implode(", ", array_fill(0, count($tableInfo::getTableFields()), '?'))
+                           ));
 
         for ($i = 0; $i < $this->getRecordCount(); $i++) {
             $row = $this->fetch($i, false);
@@ -98,17 +105,15 @@ class Fias2Sql extends DbfReader
                 switch ($this->fields[$field]['TYPE']) {
                     case 'TEXT':
                     case 'VARCHAR':
-                        $row[$field] = "'"
-                            .iconv("IBM866", "UTF-8", $val)
-                            . "'";
+                        $row[$field] = iconv("IBM866", "UTF-8", $val);
                         break;
 
                     case 'DATE':
                         if (trim($val)) {
                             try {
-                                $row[$field] = "'" . (new \DateTime(trim($val)))->format("Y-m-d H:i:s") . "'";
+                                $row[$field] = (new \DateTime(trim($val)))->format("Y-m-d H:i:s");
                             } catch (\Exception $e) {
-                                $row[$field] = "''";
+                                $row[$field] = "";
                             }
                         }
                         break;
@@ -126,26 +131,21 @@ class Fias2Sql extends DbfReader
                         break;
 
                     default:
-                        $row[$field] = "'{$val}'";
+                        $row[$field] = $this->db->quote($val);
                 }
             }
-            $sql = sprintf(
-                "insert into %s (%s) values (%s) on duplicate key update %s;\n",
-                $this->tableName,
-                implode(", ", array_keys($row)), implode(", ", $row),
-                implode(
-                    ", ", array_map(
-                    function ($val, $key) {
-                        return sprintf("%s = %s", $key, $val);
-                    }, $row, array_keys($row)))
-            );
 
-            fwrite($fileHandle, $sql);
+            try {
+                $sqliteExec->execute(array_values($row));
+            } catch (\Exception $e) {
+                $this->db->rollBack();
+                throw $e;
+            }
 
             $inserted++;
         }
 
-        fclose($fileHandle);
+        $this->db->commit();
 
         return [
             "inserted" => $inserted,
@@ -154,11 +154,21 @@ class Fias2Sql extends DbfReader
     }
 
     /**
-     * @return mixed
+     * @return \PDO
      */
     private static function getDb()
     {
-        return null;
+
+        $pdo = new \PDO(
+            'sqlite:fias.sq3',
+            null,
+            null,
+            [\PDO::ATTR_PERSISTENT => true]
+        );
+
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        return $pdo;
     }
 
     /**
@@ -178,6 +188,22 @@ class Fias2Sql extends DbfReader
     }
 
 
+    public function dropTable()
+    {
+        $this->db->exec("drop table if exists " . $this->tableName);
+    }
+
+    /**
+     *
+     */
+    public function createTable()
+    {
+        foreach ($this->tableInfo::getCreateTableSql() as $sql) {
+            $this->db->exec($sql);
+        }
+    }
+
+
     public function createIdentTable()
     {
         foreach ($this->fields as $field) {
@@ -188,12 +214,12 @@ class Fias2Sql extends DbfReader
         }
 
         $sql = sprintf(
-            "create table if not exists %s (%s) engine=InnoDB collate=utf8_unicode_ci",
+            "create table if not exists %s (%s) collate=utf8",
             $this->tableName,
             implode(", ", $ta)
         );
 
-        $this->db->queryExecute($sql);
+        $this->db->exec($sql);
     }
 
     /**
