@@ -41,32 +41,21 @@ function doConvert($files, $dir, $tableClass, $update = false)
     static $totalRecords = 0;
     static $totalTime = 0;
 
-    @unlink($tableClass::getTableName() . ".sql");
-    if (!$update) {
-        file_put_contents(
-            $tableClass::getTableName()
-            . ".sql", "truncate "
-            . $tableClass::getTableName()
-            . "\n", FILE_APPEND
-        );
-        foreach ($tableClass::getCreateTableSql() as $sql) {
-            file_put_contents($tableClass::getTableName() . ".sql", trim($sql) . "\n", FILE_APPEND);
-        }
-    }
-
     foreach (array_values($files) as $key => $file) {
         $timeStart = microtime(true);
 
         $fileSize = formatSizeUnits(filesize($dir . $file));
         fwrite(STDOUT, "{$file} ({$fileSize}) - ");
 
-        try {
-            $dbf = new \Fias\Fias2Sql($dir . $file, $tableClass);
-            $result = $dbf->convert();
-        } catch (\Exception $e) {
-            fwrite(STDOUT, print_r($e, true));
-            die();
+
+        $dbf = new \Fias\Fias2Sql($dir . $file, $tableClass);
+
+        if ($key === 0 && !$update) {
+            $dbf->dropTable();
+            $dbf->createTable();
         }
+
+        $result = $dbf->convert();
 
         $time = (microtime(true) - $timeStart);
 
@@ -82,6 +71,7 @@ function doConvert($files, $dir, $tableClass, $update = false)
 
 ini_set('max_execution_time', 0);
 @set_time_limit(0);
+error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED & ~E_WARNING);
 
 $dir = $_SERVER['DOCUMENT_ROOT'] . "/dbf/";
 $files = scandir($dir);

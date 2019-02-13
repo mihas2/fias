@@ -4,15 +4,18 @@
 /dbf/*.DBF
 composer.phar
 auth.json
+.env
 
 *.gz
 *.tgz
 *.tar.gz
 *.log
-*.sql
+./*.sql
+*.sq3
 
 *.GZ
 *.TGZ
 *.TAR.GZ
 *.LOG
-*.SQL
+./*.SQL
+*.SQ3

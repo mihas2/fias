@@ -41,7 +41,7 @@ class FiasHousesTable implements TableInfoInterface
 
         return [
             "
-                create table if not exists `mirmagnitov.ru`.fias_houses
+                create table if not exists $tableName
                 (
                     aoguid varchar(36) null,
                     buildnum varchar(10) null,
@@ -63,7 +63,7 @@ class FiasHousesTable implements TableInfoInterface
             ",
             "
                 create index fias_houses_aoguid_index
-                    on `mirmagnitov.ru`.fias_houses (aoguid);
+                    on $tableName (aoguid);
             "
         ];
     }
