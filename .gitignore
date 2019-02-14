@@ -1,5 +1,7 @@
 /.idea/
 /.git/
+/vendor/
+/cache/
 /dbf/*.dbf
 /dbf/*.DBF
 composer.phar
