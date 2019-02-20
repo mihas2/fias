@@ -11,6 +11,7 @@ class Fias extends ApiAbstract
 {
     /**
      * @return \Fias\Models\AddressModel[]
+     * @access private
      * @throws \Exception
      * @url GET /region-list/
      */

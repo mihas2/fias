@@ -304,8 +304,7 @@ class DbQuery
         ];
 
         $sql = implode("\n", $arSql);
-        print_r($arQuery);
-        print_r($sql);
+
         return $sql;
     }
 
