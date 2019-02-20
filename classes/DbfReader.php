@@ -2,8 +2,6 @@
 
 namespace Fias;
 
-use Bitrix\Main\DB\Exception;
-
 class DbfReader
 {
     /**

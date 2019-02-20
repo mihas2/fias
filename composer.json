@@ -8,5 +8,11 @@
 		"psr-4": {
 			"Fias\\": "classes/"
 		}
+	},
+	"require": {
+		"luracast/restler": "dev-master"
+	},
+	"require-dev": {
+		"symfony/var-dumper": ">= 2"
 	}
 }
