@@ -11,7 +11,9 @@ class Fias extends ApiAbstract
 {
     /**
      * @return \Fias\Models\AddressModel[]
-     * @access private
+     * @access protected
+     * @expires 86400
+     * @cache max-age={expires}, must-revalidate
      * @throws \Exception
      * @url GET /region-list/
      */
@@ -22,11 +24,13 @@ class Fias extends ApiAbstract
         return $addressManager->getRegionList();
     }
 
-
     /**
      * @param $regionUuid {@pattern /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/i}
      *
      * @return \Fias\Models\AddressModel[]
+     * @access protected
+     * @expires 86400
+     * @cache max-age={expires}, must-revalidate
      * @throws \Exception
      * @url GET /city-list/{regionUuid}/
      */
@@ -41,6 +45,9 @@ class Fias extends ApiAbstract
      * @param string $id {@pattern /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/i}
      *
      * @return \Fias\Models\AddressModel
+     * @access protected
+     * @expires 86400
+     * @cache max-age={expires}, must-revalidate
      * @throws \Exception
      */
     public function getById($id)
@@ -54,6 +61,9 @@ class Fias extends ApiAbstract
      * @param $uuid {@pattern /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/i}
      *
      * @return \Fias\Models\AddressModel[]
+     * @access protected
+     * @expires 86400
+     * @cache max-age={expires}, must-revalidate
      * @throws \Exception
      * @url GET /addr-chain/{uuid}/
      */
@@ -69,6 +79,9 @@ class Fias extends ApiAbstract
      * @param string|null $uuid {@pattern /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/i}
      *
      * @return AddressModel[]
+     * @access protected
+     * @expires 86400
+     * @cache max-age={expires}, must-revalidate
      * @throws \Exception
      *
      * @url GET /address-search/{name}/
@@ -84,6 +97,9 @@ class Fias extends ApiAbstract
      * @param string|null $id {@pattern /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/i}
      *
      * @return \Fias\Models\HouseModel
+     * @access protected
+     * @expires 86400
+     * @cache max-age={expires}, must-revalidate
      * @throws \Exception
      */
     public function getHouseById($id)
@@ -98,6 +114,9 @@ class Fias extends ApiAbstract
      * @param string $name
      *
      * @return \Fias\Models\HouseModel[]
+     * @access protected
+     * @expires 86400
+     * @cache max-age={expires}, must-revalidate
      * @throws \Exception
      *
      * @url GET /house-search/{uuid}/{name}

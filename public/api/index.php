@@ -9,11 +9,11 @@ $_SERVER['SCRIPT_NAME'] = str_replace($_SERVER['DOCUMENT_ROOT'], '', __FILE__);
 Luracast\Restler\Defaults::$useUrlBasedVersioning = true;
 Luracast\Restler\Defaults::$crossOriginResourceSharing = true;
 Luracast\Restler\Defaults::$composeClass = '\Fias\Api\Compose';
-Luracast\Restler\Defaults::$cacheDirectory = $_SERVER['DOCUMENT_ROOT'] . 'cache';
+Luracast\Restler\Defaults::$cacheDirectory = $_SERVER['DOCUMENT_ROOT'] . '/../cache';
 
 $r = new Luracast\Restler\Restler(getenv('APP_ENV') === 'production');
 $r->setAPIVersion(1);
-#$r->addAuthenticationClass('Fias\Api\AccessControl');
+$r->addAuthenticationClass('Fias\Api\AccessControl');
 $r->addAPIClass('Luracast\Restler\Resources');
 $r->addAPIClass('Fias\Api\Fias');
 
