@@ -171,6 +171,7 @@ class AddressModel implements \JsonSerializable
             case 4:
             case 5:
             case 6:
+            case 35:
             case 65:
                 $o->setType(static::CITY);
                 break;

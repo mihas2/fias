@@ -4,7 +4,8 @@ namespace Fias\Api\v1;
 
 use Fias\AddressManager;
 use Fias\Api\ApiAbstract;
-use Fias\DbQuery;
+use Fias\HouseManager;
+use Fias\Models\AddressModel;
 
 class Fias extends ApiAbstract
 {
@@ -60,5 +61,50 @@ class Fias extends ApiAbstract
         $addressManager = new AddressManager();
 
         return $addressManager->getFullAddr($uuid);
+    }
+
+    /**
+     * @param string $name
+     * @param string|null $uuid {@pattern /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/i}
+     *
+     * @return AddressModel[]
+     * @throws \Exception
+     *
+     * @url GET /address-search/{name}/
+     */
+    public function getAddressSearch($name, $uuid = null)
+    {
+        $addressManager = new AddressManager();
+
+        return $addressManager->search($name, $uuid);
+    }
+
+    /**
+     * @param string|null $id {@pattern /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/i}
+     *
+     * @return \Fias\Models\HouseModel
+     * @throws \Exception
+     */
+    public function getHouseById($id)
+    {
+        $houseManager = new HouseManager();
+
+        return $houseManager->getById($id);
+    }
+
+    /**
+     * @param string $uuid {@pattern /^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$/i}
+     * @param string $name
+     *
+     * @return \Fias\Models\HouseModel[]
+     * @throws \Exception
+     *
+     * @url GET /house-search/{uuid}/{name}
+     */
+    public function getHouseSearch($uuid, $name)
+    {
+        $houseManager = new HouseManager();
+
+        return $houseManager->search($uuid, $name);
     }
 }
