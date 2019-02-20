@@ -20,16 +20,16 @@ class AccessControl implements iAuthenticate
         $userClass = Defaults::$userIdentifierClass;
         if (isset($_GET['api_key'])) {
             if (array_key_exists($_GET['api_key'], $roles)) {
+                static::$role = $roles[$_GET['api_key']];
+                $userClass::setCacheIdentifier(static::$role);
+                Resources::$accessControlFunction = 'AccessControl::verifyAccess';
+
                 return true;
             }
-        } else {
-            return false;
         }
-        static::$role = $roles[$_GET['api_key']];
-        $userClass::setCacheIdentifier(static::$role);
-        Resources::$accessControlFunction = 'AccessControl::verifyAccess';
 
-        return static::$requires == static::$role || static::$role == 'admin';
+        return false;
+
     }
 
     /**
