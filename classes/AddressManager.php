@@ -4,7 +4,6 @@ namespace Fias;
 
 
 use Fias\Models\AddressModel;
-use Fias\Models\HouseModel;
 
 class AddressManager extends AbstractManager
 {
@@ -55,7 +54,7 @@ class AddressManager extends AbstractManager
         $sql = "
             SELECT fa.*
             FROM {$tableName} fa
-            WHERE fa.aolevel IN (4, 5, 6)
+            WHERE fa.aolevel IN (35, 4, 5, 6)
               AND (parentguid = '{$regionUuid}'
                      OR parentguid IN (SELECT aoguid FROM {$tableName} WHERE parentguid = '{$regionUuid}'))";
 
@@ -72,27 +71,24 @@ class AddressManager extends AbstractManager
      * @param string $uuid
      *
      * @return AddressModel[]
+     * @throws \Exception
      */
     public function getFullAddr($uuid)
     {
-        $tableName = static::TABLE;
-
-        $this->db->query("SET collation_connection = utf8_unicode_ci");
-        $sql = "
-            SELECT fa.*, @pid := fa.parentguid pid
-            FROM (
-                 SELECT fap.*
-                 FROM {$tableName} fap
-                 JOIN (SELECT @pid := '{$uuid}') initial
-                 ORDER BY fap.aolevel DESC
-                 ) fa
-            WHERE fa.aoguid = @pid";
-
-        $result = $this->db->query($sql, \PDO::FETCH_ASSOC);
         $addresses = [];
-        while ($address = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $addresses[] = AddressModel::mapFields($address);
-        }
+
+        do {
+            $query = new DbQuery(["aoguid = '$uuid'"]);
+            $query->setLimit(1);
+
+            $address = $this->getList($query)[0];
+            if ($address) {
+                $addresses[] = $address;
+                $uuid = $address->getParentId();
+            }
+
+        } while ($address);
+
 
         return $addresses;
 
@@ -109,40 +105,19 @@ class AddressManager extends AbstractManager
     {
         $tableName = static::TABLE;
 
-        $name = $this->db->quote($name."%");
+        $name = $this->db->quote($name . "%");
         if ($uuid) {
             $query = new DbQuery(["aoguid = '{$uuid}'"]);
             $query->setLimit(1);
             $address = $this->getList($query)[0];
             if ($address) {
-                switch ($address->getType()) {
-                    case AddressModel::REGION:
-                        $level = "35, 4, 5, 6";
-                        break;
-                    case AddressModel::AREA:
-                        $level = "35, 4, 5, 6";
-                        break;
-                    case AddressModel::CITY:
-                        $level = "7";
-                        break;
-                    case AddressModel::STREET:
-                        $level = "8";
-                        break;
-                    default:
-                        $level = "1, 2";
-                }
                 $sql = "
                 SELECT *
-                FROM (SELECT *
-                      FROM (SELECT * FROM {$tableName} ORDER BY parentguid, aoguid) products_sorted,
-                           (SELECT @pid := '{$uuid}') initialisation
-                      WHERE FIND_IN_SET(parentguid, (@pid COLLATE utf8_unicode_ci)) > 0
-                              AND @pid := CONCAT(@pid, ',', aoguid)) fa
-                WHERE 1=1
-                    AND offname LIKE {$name}
-                    AND aolevel IN ($level)
-            ";
-
+                FROM fias_addresses
+                WHERE offname LIKE {$name}
+                    AND parentguid = '{$uuid}'";
+            } else {
+                return [];
             }
         } else {
             $sql = "
