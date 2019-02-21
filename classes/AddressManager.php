@@ -55,13 +55,9 @@ class AddressManager extends AbstractManager
         $sql = "
             SELECT fa.*
             FROM {$tableName} fa
-                   JOIN (SELECT aoguid, parentguid
-                         FROM (SELECT * FROM {$tableName} ORDER BY parentguid, aoguid) products_sorted,
-                              (SELECT @pid := '{$regionUuid}') initialisation
-                         WHERE FIND_IN_SET(parentguid, @pid) > 0 AND @pid := CONCAT(@pid, ',', aoguid)) tree
-                     ON tree.aoguid = fa.aoguid
             WHERE fa.aolevel IN (4, 5, 6)
-            ORDER BY fa.offname";
+              AND (parentguid = '{$regionUuid}'
+                     OR parentguid IN (SELECT aoguid FROM {$tableName} WHERE parentguid = '{$regionUuid}'))";
 
         $result = $this->db->query($sql, \PDO::FETCH_ASSOC);
         $addresses = [];

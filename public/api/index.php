@@ -15,7 +15,7 @@ $r = new Luracast\Restler\Restler(getenv('APP_ENV') === 'production');
 $r->setAPIVersion(1);
 $r->addAuthenticationClass('Fias\Api\AccessControl');
 $r->addAPIClass('Luracast\Restler\Resources');
-$r->addAPIClass('Fias\Api\Fias');
+$r->addAPIClass('Fias\Api\v1\Fias');
 
 
 /** Удаляем хэдеры */
