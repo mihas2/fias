@@ -31,7 +31,7 @@ RUN apt-get -qq -y install  php7.2-cli \
                 php7.2-xsl \
         && apt-get -qq autoclean
 
-RUN apt-get -qq -y install php-dev libmcrypt-dev php-pear \
+RUN apt-get -qq -y install php7.2-dev libmcrypt-dev php-pear \
  && pecl channel-update pecl.php.net \
  && pecl install mcrypt-1.0.1
 

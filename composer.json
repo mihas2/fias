@@ -4,6 +4,12 @@
         "vendor-dir": "./vendor/"
     },
     "minimum-stability" : "dev",
+	"require": {
+		"php": ">= 7.2.0",
+		"ext-json": "*",
+		"ext-pdo": "*",
+		"ext-sqlite": "*"
+	},
 	"autoload": {
 		"psr-4": {
 			"Fias\\": "classes/"
