@@ -1,7 +1,7 @@
 [mysqld]
 skip-host-cache
 skip-name-resolve
-skip-grant-tables
+#skip-grant-tables
 user   = mysql
 pid-file = /var/run/mysqld/mysqld.pid
 socket   = /var/run/mysqld/mysqld.sock
