@@ -1,4 +1,10 @@
 <?php
+
+use Fias\Fias2Sql;
+use Fias\FiasAddressTable;
+use Fias\FiasHousesTable;
+use Fias\TableInfoInterface;
+
 if ($_SERVER['DOCUMENT_ROOT']) {
     die();
 }
@@ -35,7 +41,7 @@ function formatSizeUnits($bytes)
  */
 function doConvert($files, $dir, $tableClass, $update = false)
 {
-    /** @var  $tableClass \Fias\TableInfoInterface */
+    /** @var  $tableClass TableInfoInterface */
 
     static $totalInserted = 0;
     static $totalRecords = 0;
@@ -48,7 +54,7 @@ function doConvert($files, $dir, $tableClass, $update = false)
         fwrite(STDOUT, "{$file} ({$fileSize}) - ");
 
 
-        $dbf = new \Fias\Fias2Sql($dir . $file, $tableClass);
+        $dbf = new Fias2Sql($dir . $file, $tableClass);
 
         if ($key === 0 && !$update) {
             $dbf->dropTable();
@@ -77,14 +83,18 @@ $dir = $_SERVER['DOCUMENT_ROOT'] . "/dbf/";
 $files = scandir($dir);
 
 $addrObjFiles = array_filter(
-    $files, function ($file) {
-    return (bool)preg_match("/^addrob\d+\.dbf$/i", $file);
-});
+    $files,
+    function ($file) {
+        return (bool)preg_match("/^addrob\d+\.dbf$/i", $file);
+    }
+);
 
 $housesFiles = array_filter(
-    $files, function ($file) {
-    return (bool)preg_match("/^house\d+\.dbf$/i", $file);
-});
+    $files,
+    function ($file) {
+        return (bool)preg_match("/^house\d+\.dbf$/i", $file);
+    }
+);
 
 switch (strtolower($argv[1])) {
     case 'update':
@@ -98,5 +108,5 @@ switch (strtolower($argv[1])) {
         exit();
 }
 
-doConvert($addrObjFiles, $dir, \Fias\FiasAddressTable::class, $update);
-doConvert($housesFiles, $dir, \Fias\FiasHousesTable::class, $update);
+doConvert($addrObjFiles, $dir, FiasAddressTable::class, $update);
+doConvert($housesFiles, $dir, FiasHousesTable::class, $update);

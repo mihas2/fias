@@ -27,7 +27,7 @@ class FiasHousesTable implements TableInfoInterface
     /**
      * @return string
      */
-    static public function getTableName()
+    public static function getTableName()
     {
         return 'fias_houses';
     }
@@ -35,7 +35,7 @@ class FiasHousesTable implements TableInfoInterface
     /**
      * @return array
      */
-    static public function getCreateTableSql()
+    public static function getCreateTableSql()
     {
         $tableName = static::getTableName();
 
@@ -60,15 +60,15 @@ class FiasHousesTable implements TableInfoInterface
             ",
             "
                 create index fias_houses_aoguid_index2
-	            ${tableName} (aoguid);
+	            on ${tableName} (aoguid);
 	        ",
             "
                 create index fias_houses_houseguid_index
-	            ${tableName} (houseguid);
+	            on ${tableName} (houseguid);
             ",
             "
                 create index fias_houses_housenum_index
-            	${tableName} (housenum);
+            	on ${tableName} (housenum);
 	        "
         ];
     }
@@ -78,7 +78,7 @@ class FiasHousesTable implements TableInfoInterface
      *
      * @return array
      */
-    static public function recordProcessing($record)
+    public static function recordProcessing($record)
     {
         foreach ($record as $field => $val) {
             switch (strtolower($field)) {
@@ -97,7 +97,7 @@ class FiasHousesTable implements TableInfoInterface
     /**
      * @return array
      */
-    static public function getTableFields()
+    public static function getTableFields()
     {
         return [
             'aoguid',
@@ -118,7 +118,7 @@ class FiasHousesTable implements TableInfoInterface
     /**
      * @inheritdoc
      */
-    static public function isActual($row)
+    public static function isActual($row)
     {
         return ((new \DateTime(trim($row['ENDDATE']))) > (new \DateTime()));
     }

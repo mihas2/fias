@@ -103,7 +103,9 @@ class Fias2Sql extends DbfReader
             foreach ($tableInfo::recordProcessing($row) as $field => $val) {
                 if (count($tableInfo::getTableFields()) > 0
                     && !in_array(
-                        strtolower($field), $tableInfo::getTableFields())
+                        strtolower($field),
+                        $tableInfo::getTableFields()
+                    )
                 ) {
                     unset($row[$field]);
                     continue; // удаляем и пропускаем поля которые нам не нужны
@@ -192,7 +194,7 @@ class Fias2Sql extends DbfReader
     public function dropTable()
     {
         $file = fopen($this->fileName, "w");
-        fwrite($file, "drop table if exists " . $this->tableName.";\n");
+        fwrite($file, "drop table if exists " . $this->tableName . ";\n");
         fclose($file);
     }
 
@@ -203,7 +205,7 @@ class Fias2Sql extends DbfReader
     {
         $file = fopen($this->fileName, "a");
         foreach ($this->tableInfo::getCreateTableSql() as $sql) {
-            fwrite($file, $sql."\n");
+            fwrite($file, $sql . "\n");
         }
         fclose($file);
     }
@@ -215,7 +217,7 @@ class Fias2Sql extends DbfReader
             $t = ($field['TYPE'] === 'VARCHAR') ? "(" . $field['SIZE'] . ")" : '';
 
             $ta[] = " " . strtolower($field['NAME']) . " "
-                . $field['TYPE'] . $t;
+                    . $field['TYPE'] . $t;
         }
 
         $sql = sprintf(

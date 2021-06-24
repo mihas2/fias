@@ -8,30 +8,29 @@ interface TableInfoInterface
     /**
      * @return string
      */
-    static public function getTableName();
+    public static function getTableName();
 
     /**
      * @return array
      */
-    static public function getCreateTableSql();
+    public static function getCreateTableSql();
 
     /**
      * @return array
      */
-    static public function getTableFields();
+    public static function getTableFields();
 
     /**
      * @param array $row - исходные данные записи ввиде массива, где ключ имя поля
      *
      * @return bool
      */
-    static public function isActual($row);
+    public static function isActual($row);
 
     /**
      * @param array $record
      *
      * @return array
      */
-    static public function recordProcessing($record);
-
+    public static function recordProcessing($record);
 }

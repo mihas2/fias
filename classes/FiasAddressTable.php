@@ -8,7 +8,7 @@ class FiasAddressTable implements TableInfoInterface
     /**
      * @return string
      */
-    static public function getTableName()
+    public static function getTableName()
     {
         return 'fias_addresses';
     }
@@ -16,7 +16,7 @@ class FiasAddressTable implements TableInfoInterface
     /**
      * @return array
      */
-    static public function getCreateTableSql()
+    public static function getCreateTableSql()
     {
         $tableName = static::getTableName();
 
@@ -47,7 +47,7 @@ class FiasAddressTable implements TableInfoInterface
     /**
      * @return array
      */
-    static public function getTableFields()
+    public static function getTableFields()
     {
         return [
             "aoguid",
@@ -64,7 +64,7 @@ class FiasAddressTable implements TableInfoInterface
     /**
      * @inheritdoc
      */
-    static public function isActual($row)
+    public static function isActual($row)
     {
         return (bool)trim($row['ACTSTATUS']);
     }
@@ -74,7 +74,7 @@ class FiasAddressTable implements TableInfoInterface
      *
      * @return array
      */
-    static public function recordProcessing($record)
+    public static function recordProcessing($record)
     {
         return $record;
     }

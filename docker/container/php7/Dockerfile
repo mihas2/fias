@@ -1,6 +1,8 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 # Install any custom system requirements here
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get -qq update \
   && apt-get -qq -y upgrade \
